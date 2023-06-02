@@ -1,0 +1,3 @@
+/Users/damonburdell/browncs/CS1670/weenix/build/CMakeFiles/weenix_64.dir
+/Users/damonburdell/browncs/CS1670/weenix/build/CMakeFiles/edit_cache.dir
+/Users/damonburdell/browncs/CS1670/weenix/build/CMakeFiles/rebuild_cache.dir

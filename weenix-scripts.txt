@@ -1,0 +1,33 @@
+function wg {
+    if [[ $# -eq 1 ]]; then
+        if [[ "$1" != "-n" ]]; then
+            echo 'incorrect usage'
+            return 127
+        fi
+    fi
+
+    WEENIX_DIR=/vagrant
+
+    if [[ "$1" = "-n" ]]; then
+        $WEENIX_DIR/weenix -n -d gdb; pkill qemu
+    else
+        $WEENIX_DIR/weenix -d gdb; pkill qemu
+    fi
+}
+
+function rw {
+     if [[ $# -eq 1 ]]; then
+        if [[ "$1" != "-n" ]]; then
+            echo 'incorrect usage' ]]
+            return 127
+        fi
+    fi
+
+    WEENIX_DIR=/vagrant
+
+    if [[ "$1" = "-n" ]]; then
+        $WEENIX_DIR/weenix -n;
+    else
+        $WEENIX_DIR/weenix;
+    fi
+}

@@ -1,0 +1,247 @@
+cmake_minimum_required(VERSION 3.12)
+project(weenix_64 C)
+
+set(CMAKE_C_STANDARD 11)
+
+include_directories(kernel/include)
+include_directories(kernel/include/api)
+include_directories(kernel/include/boot)
+include_directories(kernel/include/drivers)
+include_directories(kernel/include/drivers/disk)
+include_directories(kernel/include/drivers/tty)
+include_directories(kernel/include/fs)
+include_directories(kernel/include/fs/ramfs)
+include_directories(kernel/include/fs/s5fs)
+include_directories(kernel/include/main)
+include_directories(kernel/include/mm)
+include_directories(kernel/include/proc)
+include_directories(kernel/include/test)
+include_directories(kernel/include/test/kshell)
+include_directories(kernel/include/test/vfstest)
+include_directories(kernel/include/util)
+include_directories(kernel/include/vm)
+include_directories(kernel/test/kshell)
+include_directories(user/include)
+include_directories(user/include/pthread)
+include_directories(user/include/sys)
+include_directories(user/include/test)
+include_directories(user/include/weenix)
+include_directories(user/lib/ld-weenix)
+include_directories(user/usr/bin/tests)
+
+add_executable(weenix_64
+        kernel/api/access.c
+        kernel/api/binfmt.c
+        kernel/api/elf.c
+        kernel/api/exec.c
+        kernel/api/syscall.c
+        kernel/boot/boot.S
+        kernel/drivers/keyboard.c
+        kernel/drivers/blockdev.c
+        kernel/drivers/chardev.c
+        kernel/drivers/memdevs.c
+        kernel/drivers/pcie.c
+        kernel/entry/entry.c
+        kernel/fs/ramfs/ramfs.c
+        kernel/fs/s5fs/s5fs.c
+        kernel/fs/s5fs/s5fs_subr.c
+        kernel/fs/file.c
+        kernel/fs/namev.c
+        kernel/fs/open.c
+        kernel/fs/pipe.c
+        kernel/fs/vfs.c
+        kernel/fs/vfs_syscall.c
+        kernel/fs/vnode.c
+        kernel/fs/vnode_specials.c
+        kernel/include/api/access.h
+        kernel/include/api/binfmt.h
+        kernel/include/api/elf.h
+        kernel/include/api/exec.h
+        kernel/include/api/syscall.h
+        kernel/include/api/utsname.h
+        kernel/include/boot/config.h
+        kernel/include/drivers/keyboard.h
+        kernel/include/drivers/tty/tty.h
+        kernel/include/drivers/blockdev.h
+        kernel/include/drivers/chardev.h
+        kernel/include/drivers/dev.h
+        kernel/include/drivers/memdevs.h
+        kernel/include/drivers/pcie.h
+        kernel/include/fs/ramfs/ramfs.h
+        kernel/include/fs/s5fs/s5fs.h
+        kernel/include/fs/s5fs/s5fs_privtest.h
+        kernel/include/fs/s5fs/s5fs_subr.h
+        kernel/include/fs/dirent.h
+        kernel/include/fs/fcntl.h
+        kernel/include/fs/file.h
+        kernel/include/fs/lseek.h
+        kernel/include/fs/open.h
+        kernel/include/fs/pipe.h
+        kernel/include/fs/stat.h
+        kernel/include/fs/vfs.h
+        kernel/include/fs/vfs_privtest.h
+        kernel/include/fs/vfs_syscall.h
+        kernel/include/fs/vnode.h
+        kernel/include/fs/vnode_specials.h
+        kernel/include/main/acpi.h
+        kernel/include/main/apic.h
+        kernel/include/main/cpuid.h
+        kernel/include/main/entry.h
+        kernel/include/main/gdt.h
+        kernel/include/main/inits.h
+        kernel/include/main/interrupt.h
+        kernel/include/main/io.h
+        kernel/include/main/smp.h
+        kernel/include/mm/kmalloc.h
+        kernel/include/mm/mm.h
+        kernel/include/mm/mman.h
+        kernel/include/mm/mobj.h
+        kernel/include/mm/page.h
+        kernel/include/mm/pagetable.h
+        kernel/include/mm/pframe.h
+        kernel/include/mm/slab.h
+        kernel/include/mm/tlb.h
+        kernel/include/proc/context.h
+        kernel/include/proc/core.h
+        kernel/include/proc/kmutex.h
+        kernel/include/proc/kthread.h
+        kernel/include/proc/proc.h
+        kernel/include/proc/sched.h
+        kernel/include/proc/spinlock.h
+        kernel/include/test/kshell/io.h
+        kernel/include/test/kshell/kshell.h
+        kernel/include/test/vfstest/vfstest.h
+        kernel/include/test/s5fstest.h
+        kernel/include/util/bits.h
+        kernel/include/util/debug.h
+        kernel/include/util/delay.h
+        kernel/include/util/gdb.h
+        kernel/include/util/init.h
+        kernel/include/util/list.h
+        kernel/include/util/printf.h
+        kernel/include/util/string.h
+        kernel/include/util/time.h
+        kernel/include/vm/anon.h
+        kernel/include/vm/brk.h
+        kernel/include/vm/mmap.h
+        kernel/include/vm/pagefault.h
+        kernel/include/vm/shadow.h
+        kernel/include/vm/vmmap.h
+        kernel/include/config.h
+        kernel/include/ctype.h
+        kernel/include/errno.h
+        kernel/include/globals.h
+        kernel/include/kernel.h
+        kernel/include/limits.h
+        kernel/include/multiboot.h
+        kernel/include/stdarg.h
+        kernel/include/types.h
+        kernel/main/acpi.c
+        kernel/main/apic.c
+        kernel/main/gdt.c
+        kernel/main/interrupt.c
+        kernel/main/kmain.c
+        kernel/main/smp.c
+        kernel/mm/mobj.c
+        kernel/mm/page.c
+        kernel/mm/pagetable.c
+        kernel/mm/pframe.c
+        kernel/mm/slab.c
+        kernel/proc/context.c
+        kernel/proc/fork.c
+        kernel/proc/kmutex.c
+        kernel/proc/kthread.c
+        kernel/proc/proc.c
+        kernel/proc/sched.c
+        kernel/proc/spinlock.c
+        kernel/test/kshell/command.c
+        kernel/test/kshell/command.h
+        kernel/test/kshell/commands.c
+        kernel/test/kshell/commands.h
+        kernel/test/kshell/io.c
+        kernel/test/kshell/kshell.c
+        kernel/test/kshell/priv.h
+        kernel/test/kshell/tokenizer.c
+        kernel/test/kshell/tokenizer.h
+        kernel/test/pipes.c
+        kernel/test/s5fstest.c
+        kernel/test/usertest.c
+        kernel/util/debug.c
+        kernel/util/init.c
+        kernel/util/math.c
+        kernel/util/printf.c
+        kernel/util/string.c
+        kernel/util/time.c
+        kernel/vm/anon.c
+        kernel/vm/brk.c
+        kernel/vm/mmap.c
+        kernel/vm/pagefault.c
+        kernel/vm/shadow.c
+        kernel/vm/vmmap.c
+        user/bin/ed.c
+        user/bin/hd.c
+        user/bin/ls.c
+        user/bin/sh.c
+        user/bin/stat.c
+        user/bin/uname.c
+        user/include/pthread/pthread.h
+        user/include/test/test.h
+        user/include/weenix/debug.h
+        user/include/weenix/trap.h
+        user/include/stddef.h
+        user/include/stdio.h
+        user/include/stdlib.h
+        user/include/string.h
+        user/include/unistd.h
+        user/lib/ld-weenix/asm.h
+        user/lib/ld-weenix/ldalloc.c
+        user/lib/ld-weenix/ldalloc.h
+        user/lib/ld-weenix/ldnames.c
+        user/lib/ld-weenix/ldnames.h
+        user/lib/ld-weenix/ldreloc_x86_64.c
+        user/lib/ld-weenix/ldresolve.c
+        user/lib/ld-weenix/ldresolve.h
+        user/lib/ld-weenix/ldstart.c
+        user/lib/ld-weenix/ldtypes.h
+        user/lib/ld-weenix/ldutil.c
+        user/lib/ld-weenix/ldutil.h
+        user/lib/ld-weenix/smacros.h
+        user/lib/libc/errno.c
+        user/lib/libc/malloc.c
+        user/lib/libc/printf.c
+        user/lib/libc/quad.c
+        user/lib/libc/rand.c
+        user/lib/libc/scanf.c
+        user/lib/libc/stream.c
+        user/lib/libc/string.c
+        user/lib/libc/strtol.c
+        user/lib/libc/syscall.c
+        user/lib/libc/vsnprintf.c
+        user/lib/libc/vsscanf.c
+        user/lib/libtest/test.c
+        user/sbin/halt.c
+        user/sbin/init.c
+        user/usr/bin/tests/eatinodes.c
+        user/usr/bin/tests/eatmem.c
+        user/usr/bin/tests/elf_test-64.c
+        user/usr/bin/tests/forkbomb.c
+        user/usr/bin/tests/forktest.c
+        user/usr/bin/tests/linkermagic.h
+        user/usr/bin/tests/memtest.c
+        user/usr/bin/tests/pipetest.c
+        user/usr/bin/tests/s5fstest.c
+        user/usr/bin/tests/stress.c
+        user/usr/bin/tests/vfstest.c
+        user/usr/bin/args.c
+        user/usr/bin/hello.c
+        user/usr/bin/kshell.c
+        user/usr/bin/spin.c
+        user/usr/bin/wc.c
+        kernel/drivers/tty/tty.c
+        kernel/include/drivers/tty/vterminal.h
+        kernel/include/drivers/tty/ldisc.h
+        kernel/drivers/tty/ldisc.c
+        kernel/include/boot/multiboot_macros.h
+        kernel/drivers/screen.c
+        kernel/include/drivers/screen.h
+        kernel/drivers/tty/vterminal.c kernel/drivers/disk/sata.c kernel/include/drivers/disk/sata.h kernel/include/drivers/disk/ahci.h kernel/util/list.c user/usr/bin/tests/prime.c)

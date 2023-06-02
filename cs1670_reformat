@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./clang-format -i -style='{ BasedOnStyle: LLVM, UseTab: Never, AllowShortBlocksOnASingleLine: true, AllowShortLoopsOnASingleLine: true, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4 }' $@
+
+

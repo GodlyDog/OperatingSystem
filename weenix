@@ -1,0 +1,131 @@
+#!/bin/bash
+
+USAGE="Usage: $0 [OPTION]...
+-h --help            Display this help dialog.
+-c --check           Enable memcheck leak detection. Requires -d gdb.
+-d --debug <arg>     Run with debugging support. 'gdb' will start gdb
+                     and 'qemu' will start the qemu monitor.
+-n --new-disk        Use a fresh copy of the hard disk image.
+"
+
+# XXX hardcoding these temporarily -- should be read from the makefiles
+KERN_DIR=kernel
+ISO_IMAGE=weenix.iso
+SYMBOLS=kernel.bin
+GDB_COMM_INIT=commands.gdb
+GDB_PREINIT=preinit.gdb
+GDB_INIT=init.gdb
+GDB_MEMCHECK=memcheck.gdb
+GDBCOMM=gdb-commands
+
+cd $(dirname $0)
+
+dbgmode="run"
+newdisk=
+memcheck=
+while (( "$#" )); do
+	case "$1" in
+		-h|--help) echo "$USAGE" >&2 ; exit 0 ;;
+		-c|--check) memcheck=1 ; shift ;;
+		-n|--new-disk) newdisk=1 ; shift ;;
+		-d|--debug) dbgmode="$2" ; shift 2 ;;
+		--) shift ;;
+		*) echo "Argument error." >&2 ; exit 2 ;;
+	esac
+done
+
+QEMU=qemu-system-x86_64
+
+#if ! which $QEMU; then
+	#echo "Unable to find qemu." >&2
+	#exit 2
+#fi
+# QEMU=qemu/build/x86_64-softmmu/qemu-system-x86_64
+
+QEMU_FLAGS="-k en-us -boot order=dca -device isa-debug-exit "
+QEMU_FLAGS+="-drive format=raw,file=disk0.img "
+QEMU_FLAGS+="-smp 4 -vga std -machine q35 "
+#QEMU_FLAGS+="-chardev null,id=char0 "
+#QEMU_FLAGS+="-device pci-serial,chardev=char0,id=d1 "
+
+
+MEMCHECK_INIT=
+if [[ -n "$memcheck" ]]
+then
+    case $dbgmode in
+        gdb)
+            MEMCHECK_INIT="-x $GDB_MEMCHECK"
+            ;;
+        *)
+            echo "memcheck is only supported with -d gdb" >&2
+            exit 2
+            ;;
+    esac
+fi
+if [[ -n "$newdisk" || ! ( -f disk0.img ) ]]; then
+	cp -f user/disk0.img disk0.img
+fi
+
+MEMORY=1024
+
+case $dbgmode in
+	run)
+		$QEMU $QEMU_FLAGS -m "$MEMORY" -cdrom "$KERN_DIR/$ISO_IMAGE" -serial stdio
+		;;
+	gdb)
+		# We recommend using GDB 8.1 or higher
+		# This path is used by default to ensure department machine compatibility
+		GDB=gdb
+		GDB_PORT=1234
+		GDB_TERM=xterm
+
+		if ! which $GDB; then
+			echo "Unable to find gdb." >&2
+			exit 2
+		fi
+
+		GDB_FLAGS="-x $GDB_PREINIT -s $KERN_DIR/$SYMBOLS -x $GDB_COMM_INIT $MEMCHECK_INIT -x $GDB_INIT"
+		rm -f "$GDB_COMM_INIT"
+		cat "$KERN_DIR/$GDBCOMM" | grep -E ".(gdb|py)$" | while read file
+		do
+			echo "source $file" >> "$GDB_COMM_INIT"
+		done
+		> "$GDB_COMM_INIT" 
+
+		#$QEMU $QEMU_FLAGS -m "$MEMORY" -cdrom "$KERN_DIR/$ISO_IMAGE" -s -S -daemonize &
+		xterm -e $QEMU $QEMU_FLAGS -m "$MEMORY" -cdrom "$KERN_DIR/$ISO_IMAGE"  -serial stdio -s -S &
+		$GDB $GDB_FLAGS
+		;;
+	gdb-only)
+		# We recommend using GDB 8.1 or higher
+		# This path is used by default to ensure department machine compatibility
+		GDB=gdb
+		GDB_PORT=1234
+		GDB_TERM=xterm
+
+
+		if ! which $GDB; then
+			echo "Unable to find gdb." >&2
+			exit 2
+		fi
+
+		GDB_FLAGS="-x $GDB_PREINIT -s $KERN_DIR/$SYMBOLS -x $GDB_COMM_INIT $MEMCHECK_INIT -x $GDB_INIT"
+		rm -f "$GDB_COMM_INIT"
+		cat "$KERN_DIR/$GDBCOMM" | grep -E ".(gdb|py)$" | while read file
+		do
+			echo "source $file" >> "$GDB_COMM_INIT"
+		done
+
+		$QEMU $QEMU_FLAGS -m "$MEMORY" -cdrom "$KERN_DIR/$ISO_IMAGE" -s -S -daemonize &
+		$GDB $GDB_FLAGS
+		;;
+	qemu)
+		$QEMU $QEMU_FLAGS -m "$MEMORY" -cdrom "$KERN_DIR/$ISO_IMAGE" -monitor stdio
+		;;
+	*)
+		echo "'$dbgmode' is an unknown debug mode." >&2
+		echo "Valid modes: gdb" >&2
+		echo "$USAGE" >&2
+		exit 1
+		;;
+esac
